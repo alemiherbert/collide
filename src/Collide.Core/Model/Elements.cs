@@ -85,6 +85,9 @@ public sealed record StructuralHost
     /// <summary>Member axis for beams/columns (used by transverse-spacing checks). Falls back to the longest bounding-box axis.</summary>
     public (Vec3 Start, Vec3 End)? Axis { get; init; }
 
+    /// <summary>Orthonormal local axes (X, Y, Z) of the host, used by placement rules with <c>frame: Host</c>. Null = global axes.</summary>
+    public IReadOnlyList<Vec3>? LocalAxes { get; init; }
+
     /// <summary>Host-specific maximum aggregate size; overrides the project value when present.</summary>
     public Length? MaximumAggregateSize { get; init; }
 

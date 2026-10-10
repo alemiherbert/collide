@@ -196,16 +196,11 @@ internal sealed class PairAnalyzer
         var clear = g.P.SurfaceDistance;
         if (clear > _pm.SearchMargin) return;
 
-        var sameLayer = a.Layer is null || b.Layer is null || a.Layer == b.Layer;
-        var differentLayers = a.Layer is not null && b.Layer is not null && a.Layer != b.Layer;
-        var ctxA = FindingFactory.Ctx(_pm, a, hostA);
-        var ctxB = FindingFactory.Ctx(_pm, b, hostB);
-        var match = RuleEngine.Find(_rules.ClearSpacing, [ctxA, ctxB], r =>
-            r.Relation == SpacingRelation.Any || (r.Relation == SpacingRelation.SameLayer && sameLayer) || (r.Relation == SpacingRelation.BetweenLayers && differentLayers));
         var owner = FindingOwner.Bars(a.Id, b.Id);
         var barIds = FindingFactory.Sorted([a.Id, b.Id]);
         var hostIds = FindingFactory.Sorted([a.HostId, b.HostId]);
-        if (match is null)
+        var req = SpacingRequirement.Evaluate(_pm, a, b, hostA, hostB);
+        if (req.Rule is null)
         {
             if (_rules.IsRequired(CheckKind.ClearSpacing))
             {
@@ -218,29 +213,18 @@ internal sealed class PairAnalyzer
             return;
         }
 
-        var rule = match.Rule;
-        var d = Math.Max(a.NominalDiameter.Millimetres, b.NominalDiameter.Millimetres);
-        var aggregate = hostA?.MaximumAggregateSize ?? _rules.Project.MaximumAggregateSize;
-        var terms = new List<(string Name, double Value, bool Aggregate)>();
-        if (rule.BarDiameterFactor is { } k) terms.Add(($"{k:0.##}·d", k * d, false));
-        if (rule.AggregateAllowance is not null || rule.AggregateFactor is not null)
+        var rule = req.Rule;
+        if (req.Required is null)
         {
-            if (aggregate is null)
-            {
-                sink.Findings.Add(FindingFactory.Indeterminate(CheckKind.ClearSpacing, owner, barIds, hostIds,
-                    $"ClearSpacing|{rule.Id}|missing:MaximumAggregateSize",
-                    $"Rule {rule.Id} needs the maximum aggregate size, which is not defined for the project or host {hostA?.Id}; clear spacing and aggregate passage cannot be verified.",
-                    ["MaximumAggregateSize"]) with { Rule = RuleReference.Of(rule) });
-                return;
-            }
-
-            if (rule.AggregateAllowance is { } allowance) terms.Add(("aggregate + allowance", aggregate.Value.Millimetres + allowance.Millimetres, true));
-            if (rule.AggregateFactor is { } f) terms.Add(($"{f:0.##}·aggregate", f * aggregate.Value.Millimetres, true));
+            sink.Findings.Add(FindingFactory.Indeterminate(CheckKind.ClearSpacing, owner, barIds, hostIds,
+                $"ClearSpacing|{rule.Id}|missing:MaximumAggregateSize",
+                $"Rule {rule.Id} needs the maximum aggregate size, which is not defined for the project or host {hostA?.Id}; clear spacing and aggregate passage cannot be verified.",
+                ["MaximumAggregateSize"]) with { Rule = RuleReference.Of(rule) });
+            return;
         }
 
-        if (rule.AbsoluteMinimum is { } abs) terms.Add(("absolute minimum", abs.Millimetres, false));
-        var gov = terms.OrderByDescending(t => t.Value).First();
-        var required = gov.Value;
+        var required = req.Required.Value;
+        var gov = (Name: req.GoverningTerm, Aggregate: req.AggregateGoverns);
         if (clear >= required - _tol.ComplianceTolerance.Millimetres) return;
 
         var location = Vec3.Lerp(g.P.PointA, g.P.PointB, 0.5);
@@ -265,7 +249,6 @@ internal sealed class PairAnalyzer
             GeometryApproximate = g.P.ErrorBound > 0,
             Rule = RuleReference.Of(rule),
             Contact = new ContactGeometry(a.Id, b.Id, g.P.PointA, g.P.PointB, Separation(g.P, sa.Segments[g.I], sb.Segments[g.J]), g.P.AngleRadians * 180 / Math.PI),
-            Inferred = lap is not null,
             Explanation = string.Create(CultureInfo.InvariantCulture,
                 $"Clear spacing {clear:0.##} mm between parallel bars is below the required {required:0.##} mm ({gov.Name}, rule {rule.Id}: {rule.Source}) over a {governingOverlap:0} mm parallel run. The bars do not intersect."),
         });
