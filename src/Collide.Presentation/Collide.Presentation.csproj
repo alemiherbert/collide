@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!--
+    Dockable-pane view models and UI-facing contracts. No Revit and no WPF dependency, so all pane behaviour
+    (filtering, grouping, counts, new/stale/resolved tracking, commands) is unit-tested without Revit.
+  -->
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <RootNamespace>Collide.Presentation</RootNamespace>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Same MVVM library and version as Tekton. -->
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Collide.Presentation.Tests" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Collide.Core\Collide.Core.csproj" />
+  </ItemGroup>
+</Project>

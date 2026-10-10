@@ -31,10 +31,27 @@ public sealed record MonitorOptions
     public int MaxConsecutiveFailures { get; init; } = 3;
 }
 
+/// <summary>The monitor surface used by UI layers (implemented by <see cref="LiveClashMonitor"/>).</summary>
+public interface ILiveMonitor
+{
+    event EventHandler<MonitorUpdate>? Updated;
+    MonitorStatus Status { get; }
+    MonitoringScope Scope { get; }
+    DetectionUpdate? LastUpdate { get; }
+    void Pause();
+    void Resume();
+    void RequestFullScan();
+    void SetScope(MonitoringScope scope);
+}
+
 public sealed record MonitorUpdate
 {
     public required MonitorStatus Status { get; init; }
     public required MonitoringScope Scope { get; init; }
+
+    /// <summary>True when this update carries a freshly validated result (false for status-only notifications).</summary>
+    public bool IsValidatedResult { get; init; }
+
     public long Revision { get; init; }
     public long? ValidatedRevision { get; init; }
     public DateTimeOffset? ValidatedAt { get; init; }
@@ -61,7 +78,7 @@ public sealed record MonitorUpdate
 /// background thread, and published. Newer changes cancel obsolete computations; results for superseded revisions are
 /// discarded. The monitor never modifies the model: corrections are a separate, approval-driven workflow.
 /// </summary>
-public sealed class LiveClashMonitor : IAsyncDisposable
+public sealed class LiveClashMonitor : ILiveMonitor, IAsyncDisposable
 {
     private readonly object _gate = new();
     private readonly IncrementalDetectionEngine _engine;
@@ -361,6 +378,7 @@ public sealed class LiveClashMonitor : IAsyncDisposable
                 {
                     Status = _upserts.Count + _deletes.Count > 0 ? MonitorStatus.Pending : _paused ? MonitorStatus.Paused : MonitorStatus.Idle,
                     Scope = _scope,
+                    IsValidatedResult = true,
                     Revision = update.Revision,
                     ValidatedRevision = update.Revision,
                     ValidatedAt = update.ValidatedAt,
