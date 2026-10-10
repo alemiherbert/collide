@@ -93,10 +93,16 @@ public sealed class ResolutionEngine
             outcomes.Add(new ResolutionOutcome { Plan = plan, Execution = execution });
         }
 
-        var after = Classify(state);
+        // Detection-time eligibility is provisional; the plan's outcome is final. Issues the run could not correct
+        // automatically are marked for engineering review with the planner's reason.
+        var decided = outcomes.Where(o => o.Plan.Decision is ResolutionDecision.NoSafeResolution or ResolutionDecision.RequiresApproval)
+            .ToDictionary(o => o.Plan.IssueId, o => o.Plan, StringComparer.Ordinal);
+        var after = Classify(state).Select(i => decided.TryGetValue(i.Id, out var plan)
+            ? i with { RequiresEngineeringReview = true, AutoResolutionReason = $"{plan.Decision}: {plan.Reason}" }
+            : i).ToArray();
         _audit.Record(runId, AuditAction.RunCompleted,
-            $"{outcomes.Count(o => o.Execution?.Status == ExecutionStatus.Committed)} correction(s) committed; {after.Count} issue(s) remain.");
-        _log.Information("Resolution run {RunId}: {Before} issues before, {After} after", runId, before.Count, after.Count);
+            $"{outcomes.Count(o => o.Execution?.Status == ExecutionStatus.Committed)} correction(s) committed; {after.Length} issue(s) remain.");
+        _log.Information("Resolution run {RunId}: {Before} issues before, {After} after", runId, before.Count, after.Length);
         return new ResolutionRunResult
         {
             RunId = runId,

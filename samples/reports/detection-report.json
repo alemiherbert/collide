@@ -1,0 +1,1174 @@
+{
+  "schemaVersion": "1.0",
+  "generatedAt": "2026-10-10T09:00:00+00:00",
+  "tool": "Collide rebar clash engine 1.0.0.0",
+  "model": {
+    "modelId": "demo-building",
+    "revision": 1,
+    "contentHash": "C3583FB4738635C9",
+    "bars": 18,
+    "hosts": 4,
+    "sets": 0,
+    "accessories": 0
+  },
+  "rules": {
+    "name": "Example project rules",
+    "revision": "A (example)",
+    "designStandard": "\u003Cgoverning design standard\u003E",
+    "standardVersion": "\u003Cedition\u003E",
+    "hash": "E82579655356357C",
+    "ruleCount": 27
+  },
+  "geometryKernel": "CapsuleGeometryKernel/1.0",
+  "summary": {
+    "totalIssues": 14,
+    "byCategory": {
+      "Constructability": 1,
+      "Detailing": 5,
+      "RebarToConcrete": 3,
+      "RebarToRebar": 5
+    },
+    "bySeverity": {
+      "High": 12,
+      "Medium": 2
+    },
+    "byStatus": {
+      "ConfirmedDefect": 7,
+      "SuspectedDefect": 7
+    },
+    "confirmedDefects": 7,
+    "suspectedDefects": 7,
+    "warnings": 0,
+    "indeterminate": 0,
+    "autoResolved": 0,
+    "requiringApproval": 0,
+    "unresolved": 14,
+    "suppressedContacts": 2
+  },
+  "issues": [
+    {
+      "id": "RC-CBC7F55C1E",
+      "category": "RebarToRebar",
+      "subtype": "Duplicate",
+      "check": "Duplicate",
+      "severity": "High",
+      "status": "ConfirmedDefect",
+      "confidence": "High",
+      "requiresEngineeringReview": true,
+      "autoResolutionPermitted": false,
+      "autoResolutionReason": "Removing or merging reinforcement changes quantities; requires engineering decision.",
+      "explanation": "Bars s-dup-a and s-dup-b occupy the same position (max centreline deviation 0 mm \u2264 duplicate tolerance 1 mm) with the same diameter and length.",
+      "recommendedAction": "Confirm which bar is intended and delete the duplicate after engineering review; check schedules for double counting.",
+      "bars": [
+        {
+          "id": "s-dup-a",
+          "elementId": "s-dup-a",
+          "mark": "S-DUP-A",
+          "nominalDiameterMm": 12,
+          "role": "Distribution",
+          "hostId": "S1",
+          "layer": "B1"
+        },
+        {
+          "id": "s-dup-b",
+          "elementId": "s-dup-b",
+          "mark": "S-DUP-B",
+          "nominalDiameterMm": 12,
+          "role": "Distribution",
+          "hostId": "S1",
+          "layer": "B1"
+        }
+      ],
+      "hosts": [
+        {
+          "id": "S1",
+          "category": "Slab",
+          "name": "S1",
+          "level": "Level 1"
+        }
+      ],
+      "affectedBarCount": 2,
+      "location": {
+        "x": 8500,
+        "y": 2800,
+        "z": 50,
+        "lengthSquared": 80092500,
+        "length": 8949.441323345274,
+        "isFinite": true
+      },
+      "levelOrZone": "Level 1",
+      "measurements": [
+        {
+          "name": "maxCentrelineDeviation",
+          "value": 0,
+          "unit": "mm"
+        },
+        {
+          "name": "barLength",
+          "value": 2800,
+          "unit": "mm"
+        }
+      ],
+      "missingInputs": [],
+      "limitations": [],
+      "findingFingerprints": [
+        "Duplicate|Duplicate|Bars:s-dup-a,s-dup-b|B:s-dup-a,s-dup-b|H:S1|R:|"
+      ],
+      "elementIds": [
+        "s-dup-a",
+        "s-dup-b",
+        "S1"
+      ]
+    },
+    {
+      "id": "RC-58D085252B",
+      "category": "RebarToRebar",
+      "subtype": "JointConflict",
+      "check": "Clash",
+      "severity": "High",
+      "status": "ConfirmedDefect",
+      "confidence": "High",
+      "requiresEngineeringReview": true,
+      "autoResolutionPermitted": false,
+      "autoResolutionReason": "No involved bar is covered by a placement-tolerance rule (or all are design-locked).",
+      "explanation": "Physical bar solids intersect: penetration 17.5 mm exceeds the contact tolerance 0.5 mm (\u00D820 vs \u00D825, contact angle 90\u00B0). No intentional-contact rule or approved exception covers this pair.",
+      "recommendedAction": "Coordinate beam and column bar positions in the joint (layer offsets, cranking, or alternate bar positions) with the engineer.",
+      "bars": [
+        {
+          "id": "beam-t1",
+          "elementId": "beam-t1",
+          "mark": "BEAM-T1",
+          "nominalDiameterMm": 20,
+          "role": "Longitudinal",
+          "hostId": "B1"
+        },
+        {
+          "id": "col-v1",
+          "elementId": "col-v1",
+          "mark": "COL-V1",
+          "nominalDiameterMm": 25,
+          "role": "Longitudinal",
+          "hostId": "C1"
+        }
+      ],
+      "hosts": [
+        {
+          "id": "B1",
+          "category": "Beam",
+          "name": "B1",
+          "level": "Level 2"
+        },
+        {
+          "id": "C1",
+          "category": "Column",
+          "name": "C1",
+          "level": "Level 1"
+        }
+      ],
+      "affectedBarCount": 2,
+      "location": {
+        "x": 60,
+        "y": 97.5,
+        "z": 2900,
+        "lengthSquared": 8423106.25,
+        "length": 2902.258818575628,
+        "isFinite": true
+      },
+      "levelOrZone": "Level 2; Level 1; Joint B1/C1",
+      "measurements": [
+        {
+          "name": "penetrationDepth",
+          "value": 17.5,
+          "unit": "mm"
+        },
+        {
+          "name": "surfaceDistance",
+          "value": -17.5,
+          "unit": "mm"
+        },
+        {
+          "name": "centrelineDistance",
+          "value": 5,
+          "unit": "mm"
+        },
+        {
+          "name": "contactAngle",
+          "value": 90,
+          "unit": "deg"
+        },
+        {
+          "name": "overlapVolume",
+          "value": 5601.2,
+          "unit": "mm3",
+          "note": "VoxelSampling"
+        },
+        {
+          "name": "clashingPrimitivePairs",
+          "value": 1,
+          "unit": "count"
+        }
+      ],
+      "missingInputs": [],
+      "limitations": [
+        "Overlap volume estimated by voxel sampling (4096 samples)."
+      ],
+      "findingFingerprints": [
+        "Clash|JointConflict|Bars:beam-t1,col-v1|B:beam-t1,col-v1|H:B1,C1|R:|"
+      ],
+      "elementIds": [
+        "beam-t1",
+        "col-v1",
+        "B1",
+        "C1"
+      ]
+    },
+    {
+      "id": "RC-AE1CB5AA18",
+      "category": "RebarToRebar",
+      "subtype": "SlabOpeningReinforcementConflict",
+      "check": "Clash",
+      "severity": "High",
+      "status": "ConfirmedDefect",
+      "confidence": "High",
+      "requiresEngineeringReview": false,
+      "autoResolutionPermitted": true,
+      "autoResolutionReason": "Candidate relocation of s-mesh within placement tolerances.",
+      "explanation": "Physical bar solids intersect: penetration 4 mm exceeds the contact tolerance 0.5 mm (\u00D812 vs \u00D816, contact angle 0\u00B0). No intentional-contact rule or approved exception covers this pair.",
+      "recommendedAction": "Shift the slab bar or the trimmer bar so they no longer occupy the same layer position; keep trimmer anchorage.",
+      "bars": [
+        {
+          "id": "s-mesh",
+          "elementId": "s-mesh",
+          "mark": "S-MESH",
+          "nominalDiameterMm": 12,
+          "role": "Distribution",
+          "hostId": "S1",
+          "layer": "B1"
+        },
+        {
+          "id": "s-trim",
+          "elementId": "s-trim",
+          "mark": "S-TRIM",
+          "nominalDiameterMm": 16,
+          "role": "OpeningTrimmer",
+          "hostId": "S1",
+          "layer": "B1"
+        }
+      ],
+      "hosts": [
+        {
+          "id": "S1",
+          "category": "Slab",
+          "name": "S1",
+          "level": "Level 1"
+        }
+      ],
+      "affectedBarCount": 2,
+      "location": {
+        "x": 8300,
+        "y": 905,
+        "z": 50,
+        "lengthSquared": 69711525,
+        "length": 8349.342788507369,
+        "isFinite": true
+      },
+      "levelOrZone": "Level 1",
+      "measurements": [
+        {
+          "name": "penetrationDepth",
+          "value": 4,
+          "unit": "mm"
+        },
+        {
+          "name": "surfaceDistance",
+          "value": -4,
+          "unit": "mm"
+        },
+        {
+          "name": "centrelineDistance",
+          "value": 10,
+          "unit": "mm"
+        },
+        {
+          "name": "contactAngle",
+          "value": 0,
+          "unit": "deg"
+        },
+        {
+          "name": "overlapVolume",
+          "value": 31880.04,
+          "unit": "mm3",
+          "note": "AnalyticParallelCylinders"
+        },
+        {
+          "name": "clashingPrimitivePairs",
+          "value": 1,
+          "unit": "count"
+        }
+      ],
+      "missingInputs": [],
+      "limitations": [],
+      "findingFingerprints": [
+        "Clash|SlabOpeningReinforcementConflict|Bars:s-mesh,s-trim|B:s-mesh,s-trim|H:S1|R:|"
+      ],
+      "elementIds": [
+        "s-mesh",
+        "s-trim",
+        "S1"
+      ]
+    },
+    {
+      "id": "RC-011A879F6E",
+      "category": "RebarToRebar",
+      "subtype": "WallOpeningReinforcementConflict",
+      "check": "Clash",
+      "severity": "High",
+      "status": "ConfirmedDefect",
+      "confidence": "High",
+      "requiresEngineeringReview": false,
+      "autoResolutionPermitted": true,
+      "autoResolutionReason": "Candidate relocation of w-v-near within placement tolerances.",
+      "explanation": "Physical bar solids intersect: penetration 4 mm exceeds the contact tolerance 0.5 mm (\u00D816 vs \u00D812, contact angle 0\u00B0). No intentional-contact rule or approved exception covers this pair.",
+      "recommendedAction": "Re-space wall bars around the opening or offset the trimmer bars into the correct layer.",
+      "bars": [
+        {
+          "id": "w-trim",
+          "elementId": "w-trim",
+          "mark": "W-TRIM",
+          "nominalDiameterMm": 16,
+          "role": "OpeningTrimmer",
+          "hostId": "W1",
+          "layer": "EF-V"
+        },
+        {
+          "id": "w-v-near",
+          "elementId": "w-v-near",
+          "mark": "W-V-NEAR",
+          "nominalDiameterMm": 12,
+          "role": "Distribution",
+          "hostId": "W1",
+          "layer": "EF-V"
+        }
+      ],
+      "hosts": [
+        {
+          "id": "W1",
+          "category": "Wall",
+          "name": "W1",
+          "level": "Level 1"
+        }
+      ],
+      "affectedBarCount": 2,
+      "location": {
+        "x": 12955,
+        "y": 40,
+        "z": 1500,
+        "lengthSquared": 170083625,
+        "length": 13041.611288487324,
+        "isFinite": true
+      },
+      "levelOrZone": "Level 1",
+      "measurements": [
+        {
+          "name": "penetrationDepth",
+          "value": 4,
+          "unit": "mm"
+        },
+        {
+          "name": "surfaceDistance",
+          "value": -4,
+          "unit": "mm"
+        },
+        {
+          "name": "centrelineDistance",
+          "value": 10,
+          "unit": "mm"
+        },
+        {
+          "name": "contactAngle",
+          "value": 0,
+          "unit": "deg"
+        },
+        {
+          "name": "overlapVolume",
+          "value": 42506.72,
+          "unit": "mm3",
+          "note": "AnalyticParallelCylinders"
+        },
+        {
+          "name": "clashingPrimitivePairs",
+          "value": 1,
+          "unit": "count"
+        }
+      ],
+      "missingInputs": [],
+      "limitations": [],
+      "findingFingerprints": [
+        "Clash|WallOpeningReinforcementConflict|Bars:w-trim,w-v-near|B:w-trim,w-v-near|H:W1|R:|"
+      ],
+      "elementIds": [
+        "w-trim",
+        "w-v-near",
+        "W1"
+      ]
+    },
+    {
+      "id": "RC-B8362B61BB",
+      "category": "RebarToConcrete",
+      "subtype": "InsufficientCover",
+      "check": "Cover",
+      "severity": "High",
+      "status": "SuspectedDefect",
+      "confidence": "High",
+      "requiresEngineeringReview": true,
+      "autoResolutionPermitted": true,
+      "autoResolutionReason": "Candidate relocation of s-low within placement tolerances.",
+      "explanation": "Cover from bar s-low to the Bottom face of S1 is 14 mm; rule COV-SLAB requires 25 mm (Example project specification \u00A74.1).",
+      "recommendedAction": "Move the bar inward to provide the required cover, or adjust bar dimensions.",
+      "bars": [
+        {
+          "id": "s-low",
+          "elementId": "s-low",
+          "mark": "S-LOW",
+          "nominalDiameterMm": 12,
+          "role": "Distribution",
+          "hostId": "S1",
+          "layer": "B1"
+        }
+      ],
+      "hosts": [
+        {
+          "id": "S1",
+          "category": "Slab",
+          "name": "S1",
+          "level": "Level 1"
+        }
+      ],
+      "affectedBarCount": 1,
+      "location": {
+        "x": 7100,
+        "y": 2500,
+        "z": 20,
+        "lengthSquared": 56660400,
+        "length": 7527.310276586186,
+        "isFinite": true
+      },
+      "levelOrZone": "Level 1",
+      "measurements": [
+        {
+          "name": "providedCover",
+          "value": 14,
+          "unit": "mm"
+        },
+        {
+          "name": "requiredCover",
+          "value": 25,
+          "unit": "mm"
+        },
+        {
+          "name": "face",
+          "value": 0,
+          "unit": "tag",
+          "note": "Bottom"
+        }
+      ],
+      "rule": {
+        "ruleId": "COV-SLAB",
+        "ruleKind": "CoverRule",
+        "source": "Example project specification \u00A74.1",
+        "verified": false
+      },
+      "missingInputs": [],
+      "limitations": [
+        "Rule COV-SLAB is not marked as engineer-verified; reported as suspected, not confirmed."
+      ],
+      "findingFingerprints": [
+        "Cover|InsufficientCover|Bars:s-low|B:s-low|H:S1|R:COV-SLAB|S1:Bottom"
+      ],
+      "elementIds": [
+        "s-low",
+        "S1"
+      ]
+    },
+    {
+      "id": "RC-8402F79EC3",
+      "category": "RebarToConcrete",
+      "subtype": "CrossesOpening",
+      "check": "Openings",
+      "severity": "High",
+      "status": "ConfirmedDefect",
+      "confidence": "High",
+      "requiresEngineeringReview": true,
+      "autoResolutionPermitted": false,
+      "autoResolutionReason": "No automated strategy for this issue type.",
+      "explanation": "Bar s-through passes 600 mm through opening O1 of host S1 (Riser).",
+      "recommendedAction": "Stop the bar at the opening with required cover and provide trimmer bars as designed.",
+      "bars": [
+        {
+          "id": "s-through",
+          "elementId": "s-through",
+          "mark": "S-THROUGH",
+          "nominalDiameterMm": 12,
+          "role": "Distribution",
+          "hostId": "S1",
+          "layer": "B1"
+        }
+      ],
+      "hosts": [
+        {
+          "id": "S1",
+          "category": "Slab",
+          "name": "S1",
+          "level": "Level 1"
+        }
+      ],
+      "affectedBarCount": 1,
+      "location": {
+        "x": 8300,
+        "y": 1300,
+        "z": 50,
+        "lengthSquared": 70582500,
+        "length": 8401.339178964268,
+        "isFinite": true
+      },
+      "levelOrZone": "Level 1",
+      "measurements": [
+        {
+          "name": "lengthInVoid",
+          "value": 600,
+          "unit": "mm"
+        }
+      ],
+      "missingInputs": [],
+      "limitations": [],
+      "findingFingerprints": [
+        "Openings|CrossesOpening|Bars:s-through|B:s-through|H:S1|R:|S1/O1"
+      ],
+      "elementIds": [
+        "s-through",
+        "S1"
+      ]
+    },
+    {
+      "id": "RC-D430D379C0",
+      "category": "RebarToConcrete",
+      "subtype": "CrossesOpening",
+      "check": "Openings",
+      "severity": "High",
+      "status": "ConfirmedDefect",
+      "confidence": "High",
+      "requiresEngineeringReview": true,
+      "autoResolutionPermitted": false,
+      "autoResolutionReason": "No automated strategy for this issue type.",
+      "explanation": "Bar w-v-through passes 1000 mm through opening WIN1 of host W1 (Window).",
+      "recommendedAction": "Stop the bar at the opening with required cover and provide trimmer bars as designed.",
+      "bars": [
+        {
+          "id": "w-v-through",
+          "elementId": "w-v-through",
+          "mark": "W-V-THROUGH",
+          "nominalDiameterMm": 12,
+          "role": "Distribution",
+          "hostId": "W1",
+          "layer": "EF-V"
+        }
+      ],
+      "hosts": [
+        {
+          "id": "W1",
+          "category": "Wall",
+          "name": "W1",
+          "level": "Level 1"
+        }
+      ],
+      "affectedBarCount": 1,
+      "location": {
+        "x": 13500,
+        "y": 40,
+        "z": 1500,
+        "lengthSquared": 184501600,
+        "length": 13583.136603892342,
+        "isFinite": true
+      },
+      "levelOrZone": "Level 1",
+      "measurements": [
+        {
+          "name": "lengthInVoid",
+          "value": 1000,
+          "unit": "mm"
+        }
+      ],
+      "missingInputs": [],
+      "limitations": [],
+      "findingFingerprints": [
+        "Openings|CrossesOpening|Bars:w-v-through|B:w-v-through|H:W1|R:|W1/WIN1"
+      ],
+      "elementIds": [
+        "w-v-through",
+        "W1"
+      ]
+    },
+    {
+      "id": "RC-AA741B5A2A",
+      "category": "Detailing",
+      "subtype": "LapLengthInsufficient",
+      "check": "Lap",
+      "severity": "High",
+      "status": "SuspectedDefect",
+      "confidence": "Medium",
+      "requiresEngineeringReview": true,
+      "autoResolutionPermitted": false,
+      "autoResolutionReason": "Lengthening laps or anchorage changes the design; never adjusted automatically.",
+      "explanation": "Lap length 300 mm is less than the required 600 mm (table entry for \u00D812; rule LAP-GENERAL: Example project specification \u00A76.1). Lap inferred from geometry.",
+      "recommendedAction": "Increase the lap length to the required value (design change: engineering approval required).",
+      "bars": [
+        {
+          "id": "s-lap-a",
+          "elementId": "s-lap-a",
+          "mark": "S-LAP-A",
+          "nominalDiameterMm": 12,
+          "role": "Distribution",
+          "hostId": "S1",
+          "layer": "B1"
+        },
+        {
+          "id": "s-lap-b",
+          "elementId": "s-lap-b",
+          "mark": "S-LAP-B",
+          "nominalDiameterMm": 12,
+          "role": "Distribution",
+          "hostId": "S1",
+          "layer": "B1"
+        }
+      ],
+      "hosts": [
+        {
+          "id": "S1",
+          "category": "Slab",
+          "name": "S1",
+          "level": "Level 1"
+        }
+      ],
+      "affectedBarCount": 2,
+      "location": {
+        "x": 8450,
+        "y": 2006,
+        "z": 50,
+        "lengthSquared": 75429036,
+        "length": 8684.98911916417,
+        "isFinite": true
+      },
+      "levelOrZone": "Level 1",
+      "measurements": [
+        {
+          "name": "providedLapLength",
+          "value": 300,
+          "unit": "mm"
+        },
+        {
+          "name": "requiredLapLength",
+          "value": 600,
+          "unit": "mm",
+          "note": "table entry for \u00D812"
+        }
+      ],
+      "rule": {
+        "ruleId": "LAP-GENERAL",
+        "ruleKind": "LapLengthRule",
+        "source": "Example project specification \u00A76.1",
+        "verified": false
+      },
+      "missingInputs": [],
+      "limitations": [
+        "Based on an inferred relationship (not declared in the model).",
+        "Rule LAP-GENERAL is not marked as engineer-verified; reported as suspected, not confirmed."
+      ],
+      "findingFingerprints": [
+        "Lap|LapLengthInsufficient|Bars:s-lap-a,s-lap-b|B:s-lap-a,s-lap-b|H:S1|R:LAP-GENERAL|"
+      ],
+      "elementIds": [
+        "s-lap-a",
+        "s-lap-b",
+        "S1"
+      ]
+    },
+    {
+      "id": "RC-3F41375579",
+      "category": "Detailing",
+      "subtype": "AnchorageInsufficient",
+      "check": "Anchorage",
+      "severity": "High",
+      "status": "SuspectedDefect",
+      "confidence": "Medium",
+      "requiresEngineeringReview": true,
+      "autoResolutionPermitted": false,
+      "autoResolutionReason": "Lengthening laps or anchorage changes the design; never adjusted automatically.",
+      "explanation": "Straight anchorage of bar beam-t1 (Start end) into C1 provides 350 mm; rule DEV-STRAIGHT requires 800 mm (40\u00B7d; Example project specification \u00A76.3).",
+      "recommendedAction": "Extend the bar or provide a hook/head to achieve the required anchorage (engineering approval required).",
+      "bars": [
+        {
+          "id": "beam-t1",
+          "elementId": "beam-t1",
+          "mark": "BEAM-T1",
+          "nominalDiameterMm": 20,
+          "role": "Longitudinal",
+          "hostId": "B1"
+        }
+      ],
+      "hosts": [
+        {
+          "id": "B1",
+          "category": "Beam",
+          "name": "B1",
+          "level": "Level 2"
+        },
+        {
+          "id": "C1",
+          "category": "Column",
+          "name": "C1",
+          "level": "Level 1"
+        }
+      ],
+      "affectedBarCount": 1,
+      "location": {
+        "x": 50,
+        "y": 100,
+        "z": 2900,
+        "lengthSquared": 8422500,
+        "length": 2902.15437218629,
+        "isFinite": true
+      },
+      "levelOrZone": "Level 2; Level 1",
+      "measurements": [
+        {
+          "name": "providedEmbedment",
+          "value": 350,
+          "unit": "mm",
+          "note": "centreline length inside the anchoring member, from the bar end"
+        },
+        {
+          "name": "requiredDevelopmentLength",
+          "value": 800,
+          "unit": "mm",
+          "note": "40\u00B7d"
+        }
+      ],
+      "rule": {
+        "ruleId": "DEV-STRAIGHT",
+        "ruleKind": "DevelopmentLengthRule",
+        "source": "Example project specification \u00A76.3",
+        "verified": false
+      },
+      "missingInputs": [],
+      "limitations": [
+        "Anchorage requirement inferred: the bar end lies inside a host other than its own.",
+        "Based on an inferred relationship (not declared in the model).",
+        "Rule DEV-STRAIGHT is not marked as engineer-verified; reported as suspected, not confirmed."
+      ],
+      "findingFingerprints": [
+        "Anchorage|AnchorageInsufficient|Bars:beam-t1|B:beam-t1|H:B1,C1|R:DEV-STRAIGHT|Start"
+      ],
+      "elementIds": [
+        "beam-t1",
+        "B1",
+        "C1"
+      ]
+    },
+    {
+      "id": "RC-633F151B31",
+      "category": "Detailing",
+      "subtype": "TransverseReinforcementMissing",
+      "check": "TransverseSpacing",
+      "severity": "High",
+      "status": "SuspectedDefect",
+      "confidence": "Medium",
+      "requiresEngineeringReview": true,
+      "autoResolutionPermitted": false,
+      "autoResolutionReason": "No automated strategy for this issue type.",
+      "explanation": "No stirrups or ties found in the start zone of C1; rule TRV-COLUMN-ENDS requires transverse reinforcement at \u2264 100 mm (Example project specification \u00A78.2).",
+      "recommendedAction": "Provide transverse reinforcement in the zone as required.",
+      "bars": [],
+      "hosts": [
+        {
+          "id": "C1",
+          "category": "Column",
+          "name": "C1",
+          "level": "Level 1"
+        }
+      ],
+      "affectedBarCount": 0,
+      "location": {
+        "x": 200,
+        "y": 200,
+        "z": 300,
+        "lengthSquared": 170000,
+        "length": 412.31056256176606,
+        "isFinite": true
+      },
+      "levelOrZone": "Level 1",
+      "measurements": [],
+      "rule": {
+        "ruleId": "TRV-COLUMN-ENDS",
+        "ruleKind": "TransverseSpacingRule",
+        "source": "Example project specification \u00A78.2",
+        "verified": false
+      },
+      "missingInputs": [],
+      "limitations": [
+        "Rule TRV-COLUMN-ENDS is not marked as engineer-verified; reported as suspected, not confirmed."
+      ],
+      "findingFingerprints": [
+        "TransverseSpacing|TransverseReinforcementMissing|Host:C1|B:|H:C1|R:TRV-COLUMN-ENDS|start zone"
+      ],
+      "elementIds": [
+        "C1"
+      ]
+    },
+    {
+      "id": "RC-D1E0A60C59",
+      "category": "Detailing",
+      "subtype": "TransverseReinforcementMissing",
+      "check": "TransverseSpacing",
+      "severity": "High",
+      "status": "SuspectedDefect",
+      "confidence": "Medium",
+      "requiresEngineeringReview": true,
+      "autoResolutionPermitted": false,
+      "autoResolutionReason": "No automated strategy for this issue type.",
+      "explanation": "No stirrups or ties found in the end zone of C1; rule TRV-COLUMN-ENDS requires transverse reinforcement at \u2264 100 mm (Example project specification \u00A78.2).",
+      "recommendedAction": "Provide transverse reinforcement in the zone as required.",
+      "bars": [],
+      "hosts": [
+        {
+          "id": "C1",
+          "category": "Column",
+          "name": "C1",
+          "level": "Level 1"
+        }
+      ],
+      "affectedBarCount": 0,
+      "location": {
+        "x": 200,
+        "y": 200,
+        "z": 2700,
+        "lengthSquared": 7370000,
+        "length": 2714.7743920996454,
+        "isFinite": true
+      },
+      "levelOrZone": "Level 1",
+      "measurements": [],
+      "rule": {
+        "ruleId": "TRV-COLUMN-ENDS",
+        "ruleKind": "TransverseSpacingRule",
+        "source": "Example project specification \u00A78.2",
+        "verified": false
+      },
+      "missingInputs": [],
+      "limitations": [
+        "Rule TRV-COLUMN-ENDS is not marked as engineer-verified; reported as suspected, not confirmed."
+      ],
+      "findingFingerprints": [
+        "TransverseSpacing|TransverseReinforcementMissing|Host:C1|B:|H:C1|R:TRV-COLUMN-ENDS|end zone"
+      ],
+      "elementIds": [
+        "C1"
+      ]
+    },
+    {
+      "id": "RC-F795714A76",
+      "category": "Detailing",
+      "subtype": "TransverseReinforcementMissing",
+      "check": "TransverseSpacing",
+      "severity": "High",
+      "status": "SuspectedDefect",
+      "confidence": "Medium",
+      "requiresEngineeringReview": true,
+      "autoResolutionPermitted": false,
+      "autoResolutionReason": "No automated strategy for this issue type.",
+      "explanation": "No stirrups or ties found in the member of B1; rule TRV-BEAM requires transverse reinforcement at \u2264 300 mm (Example project specification \u00A78.1).",
+      "recommendedAction": "Provide transverse reinforcement in the zone as required.",
+      "bars": [],
+      "hosts": [
+        {
+          "id": "B1",
+          "category": "Beam",
+          "name": "B1",
+          "level": "Level 2"
+        }
+      ],
+      "affectedBarCount": 0,
+      "location": {
+        "x": 3200,
+        "y": 200,
+        "z": 2750,
+        "lengthSquared": 17842500,
+        "length": 4224.038352098617,
+        "isFinite": true
+      },
+      "levelOrZone": "Level 2",
+      "measurements": [],
+      "rule": {
+        "ruleId": "TRV-BEAM",
+        "ruleKind": "TransverseSpacingRule",
+        "source": "Example project specification \u00A78.1",
+        "verified": false
+      },
+      "missingInputs": [],
+      "limitations": [
+        "Rule TRV-BEAM is not marked as engineer-verified; reported as suspected, not confirmed."
+      ],
+      "findingFingerprints": [
+        "TransverseSpacing|TransverseReinforcementMissing|Host:B1|B:|H:B1|R:TRV-BEAM|member"
+      ],
+      "elementIds": [
+        "B1"
+      ]
+    },
+    {
+      "id": "RC-DA43D850AC",
+      "category": "RebarToRebar",
+      "subtype": "ParallelOverlap",
+      "check": "Clash",
+      "severity": "Medium",
+      "status": "ConfirmedDefect",
+      "confidence": "High",
+      "requiresEngineeringReview": false,
+      "autoResolutionPermitted": true,
+      "autoResolutionReason": "Candidate relocation of s-x1, s-x2 within placement tolerances.",
+      "explanation": "Physical bar solids intersect: penetration 1 mm exceeds the contact tolerance 0.5 mm (\u00D816 vs \u00D816, contact angle 0\u00B0). No intentional-contact rule or approved exception covers this pair.",
+      "recommendedAction": "Relocate one bar within its placement tolerance, or adjust the layout; verify cover and spacing after the change.",
+      "bars": [
+        {
+          "id": "s-x1",
+          "elementId": "s-x1",
+          "mark": "S-X1",
+          "nominalDiameterMm": 16,
+          "role": "Distribution",
+          "hostId": "S1",
+          "layer": "B1"
+        },
+        {
+          "id": "s-x2",
+          "elementId": "s-x2",
+          "mark": "S-X2",
+          "nominalDiameterMm": 16,
+          "role": "Distribution",
+          "hostId": "S1",
+          "layer": "B1"
+        }
+      ],
+      "hosts": [
+        {
+          "id": "S1",
+          "category": "Slab",
+          "name": "S1",
+          "level": "Level 1"
+        }
+      ],
+      "affectedBarCount": 2,
+      "location": {
+        "x": 8500,
+        "y": 507.5,
+        "z": 50,
+        "lengthSquared": 72510056.25,
+        "length": 8515.283685820456,
+        "isFinite": true
+      },
+      "levelOrZone": "Level 1",
+      "measurements": [
+        {
+          "name": "penetrationDepth",
+          "value": 1,
+          "unit": "mm"
+        },
+        {
+          "name": "surfaceDistance",
+          "value": -1,
+          "unit": "mm"
+        },
+        {
+          "name": "centrelineDistance",
+          "value": 15,
+          "unit": "mm"
+        },
+        {
+          "name": "contactAngle",
+          "value": 0,
+          "unit": "deg"
+        },
+        {
+          "name": "overlapVolume",
+          "value": 10459.91,
+          "unit": "mm3",
+          "note": "AnalyticParallelCylinders"
+        },
+        {
+          "name": "clashingPrimitivePairs",
+          "value": 1,
+          "unit": "count"
+        }
+      ],
+      "missingInputs": [],
+      "limitations": [],
+      "findingFingerprints": [
+        "Clash|ParallelOverlap|Bars:s-x1,s-x2|B:s-x1,s-x2|H:S1|R:|"
+      ],
+      "elementIds": [
+        "s-x1",
+        "s-x2",
+        "S1"
+      ]
+    },
+    {
+      "id": "RC-89288ED848",
+      "category": "Constructability",
+      "subtype": "InsufficientAggregatePassage",
+      "check": "ClearSpacing",
+      "severity": "Medium",
+      "status": "SuspectedDefect",
+      "confidence": "High",
+      "requiresEngineeringReview": true,
+      "autoResolutionPermitted": true,
+      "autoResolutionReason": "Candidate relocation of s-gap-b within placement tolerances.",
+      "explanation": "Clear spacing 23 mm between parallel bars is below the required 25 mm (aggregate \u002B allowance, rule SPC-SAME-LAYER: Example project specification \u00A75.1) over a 2800 mm parallel run. The bars do not intersect.",
+      "recommendedAction": "Increase bar spacing within placement tolerances or revise the bar arrangement.",
+      "bars": [
+        {
+          "id": "s-gap-a",
+          "elementId": "s-gap-a",
+          "mark": "S-GAP-A",
+          "nominalDiameterMm": 12,
+          "role": "Distribution",
+          "hostId": "S1",
+          "layer": "B1"
+        },
+        {
+          "id": "s-gap-b",
+          "elementId": "s-gap-b",
+          "mark": "S-GAP-B",
+          "nominalDiameterMm": 12,
+          "role": "Distribution",
+          "hostId": "S1",
+          "layer": "B1"
+        }
+      ],
+      "hosts": [
+        {
+          "id": "S1",
+          "category": "Slab",
+          "name": "S1",
+          "level": "Level 1"
+        }
+      ],
+      "affectedBarCount": 2,
+      "location": {
+        "x": 8500,
+        "y": 2317.5,
+        "z": 50,
+        "lengthSquared": 77623306.25,
+        "length": 8810.40897177878,
+        "isFinite": true
+      },
+      "levelOrZone": "Level 1",
+      "measurements": [
+        {
+          "name": "clearSpacing",
+          "value": 23,
+          "unit": "mm"
+        },
+        {
+          "name": "requiredClearSpacing",
+          "value": 25,
+          "unit": "mm",
+          "note": "aggregate \u002B allowance"
+        },
+        {
+          "name": "parallelRunLength",
+          "value": 2800,
+          "unit": "mm"
+        }
+      ],
+      "rule": {
+        "ruleId": "SPC-SAME-LAYER",
+        "ruleKind": "ClearSpacingRule",
+        "source": "Example project specification \u00A75.1",
+        "verified": false
+      },
+      "missingInputs": [],
+      "limitations": [
+        "Rule SPC-SAME-LAYER is not marked as engineer-verified; reported as suspected, not confirmed."
+      ],
+      "findingFingerprints": [
+        "ClearSpacing|InsufficientAggregatePassage|Bars:s-gap-a,s-gap-b|B:s-gap-a,s-gap-b|H:S1|R:SPC-SAME-LAYER|"
+      ],
+      "elementIds": [
+        "s-gap-a",
+        "s-gap-b",
+        "S1"
+      ]
+    }
+  ],
+  "suppressed": [
+    {
+      "fingerprint": "Clash|s-x1|s-y1",
+      "subtype": "CrossingClash",
+      "barIds": [
+        "s-x1",
+        "s-y1"
+      ],
+      "reason": "Intentional contact: Orthogonal bars of adjacent layers resting on each other",
+      "ruleOrExceptionId": "IC-MESH-LAYERS",
+      "penetrationMm": 0,
+      "location": {
+        "x": 9600,
+        "y": 500,
+        "z": 57,
+        "lengthSquared": 92413249,
+        "length": 9613.181003185158,
+        "isFinite": true
+      }
+    },
+    {
+      "fingerprint": "Clash|s-x2|s-y1",
+      "subtype": "CrossingClash",
+      "barIds": [
+        "s-x2",
+        "s-y1"
+      ],
+      "reason": "Intentional contact: Orthogonal bars of adjacent layers resting on each other",
+      "ruleOrExceptionId": "IC-MESH-LAYERS",
+      "penetrationMm": 0,
+      "location": {
+        "x": 9600,
+        "y": 515,
+        "z": 57,
+        "lengthSquared": 92428474,
+        "length": 9613.972852052371,
+        "isFinite": true
+      }
+    }
+  ],
+  "suppressedTotal": 2,
+  "checksNotPerformed": [],
+  "limitations": [
+    "Bars are swept tubes along chord-approximated centrelines (arc chord error reported per measurement). Free bar ends are flat discs; near-end separations are exact lower bounds (max of two one-sided exact cylinder distances). Rib/deformation geometry is represented only through the model diameter. Overlap volume is analytic for parallel straight cylinders and for straight cylinders crossing away from their ends, voxel-sampled otherwise.",
+    "Host concrete is represented by convex solids; non-convex hosts supplied as bounding boxes are flagged as approximate and their findings are low confidence.",
+    "Faces with unknown exposure are treated as concealed only where another host is found 1 mm beyond the face at the measurement point.",
+    "Laps and anchorage targets may be inferred from geometry; such findings are reported as suspected, not confirmed.",
+    "Automated corrections are limited to rigid translations within placement tolerances; rerouting, re-bending and lap relocation are proposed only as engineering actions."
+  ],
+  "audit": [],
+  "performance": {
+    "analysisMilliseconds": 7.39,
+    "barsInModel": 18,
+    "barsAnalysed": 18,
+    "solidPrimitives": 18,
+    "candidateBarPairs": 9,
+    "primitivePairsMeasured": 9,
+    "broadPhasePruning": 0.941176,
+    "stageMilliseconds": {
+      "bars": 2.96,
+      "sets-hosts": 4.2
+    }
+  }
+}

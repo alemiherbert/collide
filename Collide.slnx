@@ -17,6 +17,9 @@
     <Project Path="src/Collide.Presentation/Collide.Presentation.csproj" />
     <Project Path="src/Collide.Revit/Collide.Revit.csproj" />
   </Folder>
+  <Folder Name="/samples/">
+    <Project Path="samples/Collide.Samples/Collide.Samples.csproj" />
+  </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Collide.Core.Tests/Collide.Core.Tests.csproj" />
     <Project Path="tests/Collide.Presentation.Tests/Collide.Presentation.Tests.csproj" />
