@@ -9,7 +9,7 @@ public sealed class CapsuleGeometryKernel : IGeometryKernel
 {
     private readonly int _voxelResolution;
 
-    public CapsuleGeometryKernel(int voxelResolution = 24)
+    public CapsuleGeometryKernel(int voxelResolution = 16)
     {
         if (voxelResolution < 4) throw new ArgumentOutOfRangeException(nameof(voxelResolution));
         _voxelResolution = voxelResolution;
@@ -21,7 +21,7 @@ public sealed class CapsuleGeometryKernel : IGeometryKernel
         "Bars are swept tubes along chord-approximated centrelines (arc chord error reported per measurement). " +
         "Free bar ends are flat discs; near-end separations are exact lower bounds (max of two one-sided exact cylinder distances). " +
         "Rib/deformation geometry is represented only through the model diameter. Overlap volume is analytic for parallel " +
-        "straight cylinders and voxel-sampled otherwise.";
+        "straight cylinders and for straight cylinders crossing away from their ends, voxel-sampled otherwise.";
 
     public BarSolid CreateSolid(string id, BarPath path, double physicalDiameter, double chordTolerance) =>
         BarSolid.FromPath(id, path, physicalDiameter / 2, chordTolerance);
@@ -59,26 +59,67 @@ public sealed class CapsuleGeometryKernel : IGeometryKernel
         return new SegmentProximity(signed, dist, c1, c2, s, t, angle, method, error);
     }
 
-    public OverlapVolume EstimateOverlapVolume(BarSolid a, BarSolid b, Aabb region)
+    public OverlapVolume EstimateOverlapVolume(BarSolid a, int segmentA, BarSolid b, int segmentB)
     {
-        if (region.IsEmpty) return new OverlapVolume(0, VolumeMethod.None, 0);
-
-        if (a.Segments.Count == 1 && b.Segments.Count == 1)
+        var sa = a.Segments[segmentA];
+        var sb = b.Segments[segmentB];
+        if (sa.ChordError == 0 && sb.ChordError == 0 && sa.Length > 0 && sb.Length > 0)
         {
-            var sa = a.Segments[0];
-            var sb = b.Segments[0];
-            var dir = sa.Direction;
-            if (dir != Vec3.Zero && Math.Abs(Vec3.Dot(dir, sb.Direction)) > Math.Cos(1e-4))
+            var dirA = sa.Direction;
+            var dirB = sb.Direction;
+            var cos = Math.Abs(Vec3.Dot(dirA, dirB));
+            if (cos > Math.Cos(1e-4))
             {
-                var p0 = Vec3.Dot(sb.A - sa.A, dir);
-                var p1 = Vec3.Dot(sb.B - sa.A, dir);
+                var p0 = Vec3.Dot(sb.A - sa.A, dirA);
+                var p1 = Vec3.Dot(sb.B - sa.A, dirA);
                 var overlap = Math.Max(0, Math.Min(sa.Length, Math.Max(p0, p1)) - Math.Max(0, Math.Min(p0, p1)));
-                var offset = ((sb.A - sa.A) - dir * Vec3.Dot(sb.A - sa.A, dir)).Length;
+                var offset = ((sb.A - sa.A) - dirA * Vec3.Dot(sb.A - sa.A, dirA)).Length;
                 var area = SegmentMath.CircleIntersectionArea(sa.Radius, sb.Radius, offset);
                 return new OverlapVolume(area * overlap, VolumeMethod.AnalyticParallelCylinders, 0);
             }
+
+            var sin = Math.Sqrt(Math.Max(0, 1 - cos * cos));
+            if (sin >= Math.Sin(10 * Math.PI / 180) && CrossingAwayFromEnds(sa, sb, sin))
+            {
+                var n = Vec3.Cross(dirA, dirB).Normalized();
+                var h = Vec3.Dot(sb.A - sa.A, n);
+                return new OverlapVolume(CrossingVolume(sa.Radius, sb.Radius, h, sin), VolumeMethod.AnalyticCrossingCylinders, 0);
+            }
         }
 
+        var region = sa.Bounds.Intersection(sb.Bounds);
+        return Voxel(a, b, region);
+    }
+
+    /// <summary>
+    /// Slices perpendicular to the common normal: each cylinder's slice is a strip of width 2√(r² − t²); two strips
+    /// crossing at θ overlap in a parallelogram of area w₁·w₂ / sin θ. Composite Simpson integration (512 intervals).
+    /// </summary>
+    internal static double CrossingVolume(double r1, double r2, double h, double sinTheta)
+    {
+        var lo = Math.Max(-r1, h - r2);
+        var hi = Math.Min(r1, h + r2);
+        if (hi <= lo) return 0;
+        const int n = 512;
+        var step = (hi - lo) / n;
+        double F(double t) => 2 * Math.Sqrt(Math.Max(0, r1 * r1 - t * t)) * 2 * Math.Sqrt(Math.Max(0, r2 * r2 - (t - h) * (t - h)));
+        var sum = F(lo) + F(hi);
+        for (var i = 1; i < n; i++) sum += F(lo + i * step) * (i % 2 == 1 ? 4 : 2);
+        return sum * step / 3 / sinTheta;
+    }
+
+    private static bool CrossingAwayFromEnds(in SolidSegment a, in SolidSegment b, double sin)
+    {
+        SegmentMath.ClosestPoints(a.A, a.B, b.A, b.B, out var s, out var t, out _, out _);
+        // Half-extent of the intersection along each axis: the other bar's radius / sin θ plus this bar's radius.
+        var marginA = (b.Radius / sin + a.Radius) / a.Length;
+        var marginB = (a.Radius / sin + b.Radius) / b.Length;
+        return s > marginA && s < 1 - marginA && t > marginB && t < 1 - marginB;
+    }
+
+    private OverlapVolume Voxel(BarSolid a, BarSolid b, Aabb region)
+    {
+        if (region.IsEmpty) return new OverlapVolume(0, VolumeMethod.None, 0);
         var n = _voxelResolution;
         var size = region.Size;
         if (size.X <= 0 || size.Y <= 0 || size.Z <= 0) return new OverlapVolume(0, VolumeMethod.VoxelSampling, 0);
@@ -94,8 +135,7 @@ public sealed class CapsuleGeometryKernel : IGeometryKernel
             if (InAny(segA, p) && InAny(segB, p)) inside++;
         }
 
-        var volume = inside * cell.X * cell.Y * cell.Z;
-        return new OverlapVolume(volume, VolumeMethod.VoxelSampling, n * n * n);
+        return new OverlapVolume(inside * cell.X * cell.Y * cell.Z, VolumeMethod.VoxelSampling, n * n * n);
     }
 
     private static bool InAny(SolidSegment[] segs, Vec3 p)

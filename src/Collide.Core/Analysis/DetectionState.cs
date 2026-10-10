@@ -22,16 +22,25 @@ public sealed class DetectionState
     public IReadOnlyList<SuppressedFinding> Suppressed { get; }
     public IReadOnlyList<LapPair> Laps { get; }
 
-    public static DetectionState Initialize(PreparedModel prepared, ModelAnalyzer analyzer, CancellationToken ct = default)
-    {
-        var result = analyzer.Analyze(prepared, AnalysisScope.All, ct);
-        return new DetectionState(prepared, result.Findings, result.Suppressed, result.Laps);
-    }
+    public static DetectionState Initialize(PreparedModel prepared, ModelAnalyzer analyzer, CancellationToken ct = default) =>
+        FromFullResult(prepared, analyzer.Analyze(prepared, AnalysisScope.All, ct));
+
+    /// <summary>Builds the state from a result computed over <see cref="AnalysisScope.All"/>.</summary>
+    public static DetectionState FromFullResult(PreparedModel prepared, AnalysisResult result) =>
+        result.Scope.IsAll
+            ? new DetectionState(prepared, result.Findings, result.Suppressed, result.Laps)
+            : throw new ArgumentException("A full-scope result is required.", nameof(result));
 
     /// <summary>Recomputes the given scope on <paramref name="next"/> and merges the result.</summary>
     public (DetectionState State, AnalysisResult Partial) Recompute(PreparedModel next, AnalysisScope scope, ModelAnalyzer analyzer, CancellationToken ct = default)
     {
         var partial = analyzer.Analyze(next, scope, ct);
+        return (Merge(next, scope, partial), partial);
+    }
+
+    /// <summary>Replaces the findings owned by <paramref name="scope"/> with a partial result computed on <paramref name="next"/>.</summary>
+    public DetectionState Merge(PreparedModel next, AnalysisScope scope, AnalysisResult partial)
+    {
         var findings = Findings.Where(f => !scope.Owns(f)).Concat(partial.Findings)
             .OrderBy(f => f.Fingerprint, StringComparer.Ordinal).ToArray();
         var suppressed = Suppressed.Where(s => !s.BarIds.Any(scope.Bars.Contains)).Concat(partial.Suppressed)
@@ -45,7 +54,7 @@ public sealed class DetectionState
             laps = partial.Laps.ToArray();
         }
 
-        return (new DetectionState(next, findings, suppressed, laps), partial);
+        return new DetectionState(next, findings, suppressed, laps);
     }
 
     /// <summary>Applies changed bars/hosts: expands the scope over before and after models, then recomputes it.</summary>

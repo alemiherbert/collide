@@ -116,24 +116,61 @@ public class KernelTests
     {
         var a = BarSolid.Cylinder("a", new Vec3(0, 0, 0), new Vec3(1000, 0, 0), 10);
         var b = BarSolid.Cylinder("b", new Vec3(200, 15, 0), new Vec3(1200, 15, 0), 10);
-        var v = Kernel.EstimateOverlapVolume(a, b, a.Bounds);
+        var v = Kernel.EstimateOverlapVolume(a, 0, b, 0);
         var expected = SegmentMath.CircleIntersectionArea(10, 10, 15) * 800;
         Assert.Equal(VolumeMethod.AnalyticParallelCylinders, v.Method);
         Assert.Equal(expected, v.CubicMillimetres, 6);
     }
 
     [Fact]
-    public void CrossingCylinderOverlapVolumeApproximatesSteinmetzSolid()
+    public void CrossingCylinderOverlapVolumeMatchesSteinmetzSolid()
     {
         // Two perpendicular Ø20 cylinders with intersecting axes: exact intersection volume 16r³/3.
         const double r = 10;
         var a = BarSolid.Cylinder("a", new Vec3(-100, 0, 0), new Vec3(100, 0, 0), r);
         var b = BarSolid.Cylinder("b", new Vec3(0, -100, 0), new Vec3(0, 100, 0), r);
-        var region = new Aabb(new Vec3(-r, -r, -r), new Vec3(r, r, r));
-        var v = new CapsuleGeometryKernel(voxelResolution: 40).EstimateOverlapVolume(a, b, region);
-        var exact = 16 * r * r * r / 3;
+        var v = Kernel.EstimateOverlapVolume(a, 0, b, 0);
+        Assert.Equal(VolumeMethod.AnalyticCrossingCylinders, v.Method);
+        Assert.Equal(16 * r * r * r / 3, v.CubicMillimetres, 0);
+    }
+
+    [Theory]
+    [InlineData(60, 0)]
+    [InlineData(90, 7)]
+    [InlineData(45, -4)]
+    public void AnalyticCrossingVolumeAgreesWithFineVoxelSampling(double angleDeg, double offset)
+    {
+        var theta = angleDeg * Math.PI / 180;
+        var a = BarSolid.Cylinder("a", new Vec3(-300, 0, 0), new Vec3(300, 0, 0), 10);
+        var dir = new Vec3(Math.Cos(theta), Math.Sin(theta), 0);
+        var b = BarSolid.Cylinder("b", -dir * 300 + new Vec3(0, 0, offset), dir * 300 + new Vec3(0, 0, offset), 8);
+        var analytic = Kernel.EstimateOverlapVolume(a, 0, b, 0);
+        Assert.Equal(VolumeMethod.AnalyticCrossingCylinders, analytic.Method);
+        // Reference: brute-force sampling over the intersection region at high resolution.
+        var region = new Aabb(new Vec3(-40, -40, -10), new Vec3(40, 40, 10));
+        var inside = 0;
+        const int n = 160;
+        var cell = region.Size / n;
+        for (var i = 0; i < n; i++)
+        for (var j = 0; j < n; j++)
+        for (var k = 0; k < n / 4; k++)
+        {
+            var p = region.Min + new Vec3((i + 0.5) * cell.X, (j + 0.5) * cell.Y, (k + 0.5) * cell.Z * 4);
+            if (a.ContainsPoint(p) && b.ContainsPoint(p)) inside++;
+        }
+
+        var reference = inside * cell.X * cell.Y * cell.Z * 4;
+        Assert.InRange(analytic.CubicMillimetres, reference * 0.97, reference * 1.03);
+    }
+
+    [Fact]
+    public void CurvedOrEndOverlapsFallBackToVoxelSampling()
+    {
+        var a = BarSolid.Cylinder("a", new Vec3(0, 0, 0), new Vec3(100, 0, 0), 10);
+        var b = BarSolid.Cylinder("b", new Vec3(95, -100, 0), new Vec3(95, 100, 0), 10); // crossing at a's end
+        var v = Kernel.EstimateOverlapVolume(a, 0, b, 0);
         Assert.Equal(VolumeMethod.VoxelSampling, v.Method);
-        Assert.InRange(v.CubicMillimetres, exact * 0.97, exact * 1.03);
+        Assert.True(v.CubicMillimetres > 0);
     }
 
     [Fact]

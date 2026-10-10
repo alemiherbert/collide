@@ -30,6 +30,9 @@ public enum VolumeMethod
 {
     None,
     AnalyticParallelCylinders,
+
+    /// <summary>Exact 1-D integral for straight cylinders crossing away from their ends: V = ∫ w₁(t)·w₂(t) / sin θ dt.</summary>
+    AnalyticCrossingCylinders,
     VoxelSampling,
 }
 
@@ -51,5 +54,6 @@ public interface IGeometryKernel
 
     SegmentProximity Measure(in SolidSegment a, in SolidSegment b);
 
-    OverlapVolume EstimateOverlapVolume(BarSolid a, BarSolid b, Aabb region);
+    /// <summary>Intersection volume of two solids near the given primitives (analytic where possible, otherwise sampled).</summary>
+    OverlapVolume EstimateOverlapVolume(BarSolid a, int segmentA, BarSolid b, int segmentB);
 }

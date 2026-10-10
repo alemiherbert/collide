@@ -111,8 +111,7 @@ internal sealed class PairAnalyzer
             if (signed < -_ct)
             {
                 var subtype = ResolveClashSubtype(a, b, hostA, hostB, sa.Segments[worst.I], sb.Segments[worst.J], worst.P, parallel);
-                var region = sa.Segments[worst.I].Bounds.Intersection(sb.Segments[worst.J].Bounds);
-                var volume = _pm.Kernel.EstimateOverlapVolume(sa, sb, region);
+                var volume = _pm.Kernel.EstimateOverlapVolume(sa, worst.I, sb, worst.J);
                 var clashing = prox.Count(p => p.P.SurfaceDistance < -_ct);
                 var notes = new List<string>();
                 if (worst.P.ErrorBound > 0) notes.Add($"Arc chord approximation: measurement error ≤ {worst.P.ErrorBound:0.###} mm.");
