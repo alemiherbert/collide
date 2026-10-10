@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>Collide</Name>
+    <Assembly>Collide.Revit\Collide.Revit.dll</Assembly>
+    <AddInId>6f0c2a8e-3b7d-4f5e-9c1a-2d8e4b6a7c90</AddInId>
+    <FullClassName>Collide.Revit.Application.CollideApplication</FullClassName>
+    <VendorId>Collide</VendorId>
+    <VendorDescription>Rebar clash detection and resolution</VendorDescription>
+  </AddIn>
+</RevitAddIns>

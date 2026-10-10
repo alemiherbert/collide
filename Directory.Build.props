@@ -5,6 +5,18 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Deterministic>true</Deterministic>
     <AnalysisLevel>latest</AnalysisLevel>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <!--
+    Solution build types follow Tekton: Debug.R25/R26/R27 and Release.R25/R26/R27. The Nice3point Revit SDK infers the
+    Revit version from the suffix for the add-in project; plain SDK projects (engine, view models, tests) only need
+    Debug/Release semantics mapped from the prefix.
+  -->
+  <PropertyGroup Condition="$(Configuration.StartsWith('Release'))">
+    <Optimize>true</Optimize>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+  <PropertyGroup Condition="$(Configuration.StartsWith('Debug'))">
+    <DefineConstants>$(DefineConstants);DEBUG</DefineConstants>
   </PropertyGroup>
 </Project>

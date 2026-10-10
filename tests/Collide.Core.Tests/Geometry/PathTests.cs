@@ -49,6 +49,23 @@ public class PathTests
     }
 
     [Fact]
+    public void ArcFromCentreStartEndMatchesParametricArcInBothDirections()
+    {
+        // Revit-style arc: C + R(cos t X + sin t Y), t ∈ [0.3, 1.9], normal = X × Y.
+        var c = new Vec3(10, 20, 30);
+        var x = Vec3.UnitX;
+        var y = Vec3.UnitY;
+        Vec3 At(double t) => c + (x * Math.Cos(t) + y * Math.Sin(t)) * 50;
+        var forward = ArcElement.FromCenterStartEnd(c, At(0.3), At(1.9), Vec3.Cross(x, y));
+        Assert.Equal(1.6, forward.Sweep, 12);
+        Assert.True(forward.PointAt(0.8).ApproximatelyEquals(At(1.1), 1e-9));
+        var reversed = ArcElement.FromCenterStartEnd(c, At(1.9), At(0.3), -Vec3.Cross(x, y));
+        Assert.Equal(1.6, reversed.Sweep, 12);
+        Assert.True(reversed.End.ApproximatelyEquals(At(0.3), 1e-9));
+        Assert.True(reversed.PointAt(0.8).ApproximatelyEquals(At(1.1), 1e-9));
+    }
+
+    [Fact]
     public void ClosedStirrupHasNoFreeEnds()
     {
         var loop = PathFactory.RectangularLoop(new Vec3(0, 0, 0), Vec3.UnitY, Vec3.UnitZ, 200, 400, 20);

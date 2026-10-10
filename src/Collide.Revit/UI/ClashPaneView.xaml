@@ -1,0 +1,147 @@
+<UserControl x:Class="Collide.Revit.UI.ClashPaneView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:Collide.Presentation.ViewModels;assembly=Collide.Presentation"
+             xmlns:ui="clr-namespace:Collide.Revit.UI"
+             MinWidth="320" Background="White" FontSize="12">
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <ui:SeverityBrushConverter x:Key="SeverityBrush" />
+        <ui:GroupingVisibilityConverter x:Key="FlatVisible" ShowWhenNone="True" />
+        <ui:GroupingVisibilityConverter x:Key="GroupedVisible" ShowWhenNone="False" />
+
+        <DataTemplate x:Key="IssueRow" DataType="{x:Type vm:IssueItemViewModel}">
+            <Grid Margin="0,2">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsStale}" Value="True">
+                                <Setter Property="Opacity" Value="0.5" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="6" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Border Grid.Column="0" Background="{Binding Severity, Converter={StaticResource SeverityBrush}}" CornerRadius="2" />
+                <StackPanel Grid.Column="1" Margin="6,0">
+                    <TextBlock FontWeight="SemiBold" Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Foreground="#555" Text="{Binding Bars}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Foreground="#777" FontSize="11" TextTrimming="CharacterEllipsis">
+                        <Run Text="{Binding Hosts, Mode=OneWay}" /> <Run Text="{Binding LevelOrZone, Mode=OneWay}" />
+                    </TextBlock>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Top">
+                    <Border Background="#1F6FEB" CornerRadius="3" Padding="4,0" Margin="2,0" Visibility="{Binding IsNew, Converter={StaticResource BoolToVis}}">
+                        <TextBlock Foreground="White" FontSize="10" Text="NEW" />
+                    </Border>
+                    <Border Background="#999" CornerRadius="3" Padding="4,0" Margin="2,0" Visibility="{Binding IsStale, Converter={StaticResource BoolToVis}}">
+                        <TextBlock Foreground="White" FontSize="10" Text="STALE" />
+                    </Border>
+                    <TextBlock Foreground="#555" FontSize="10" Text="{Binding Status}" Margin="4,0,0,0" />
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+    </UserControl.Resources>
+
+    <DockPanel Margin="6">
+        <!-- Status and counts -->
+        <StackPanel DockPanel.Dock="Top">
+            <TextBlock FontWeight="SemiBold" Text="{Binding StatusText}" TextWrapping="Wrap" />
+            <TextBlock Foreground="#666" Text="{Binding ValidatedText}" />
+            <TextBlock Foreground="#B00020" Text="{Binding LastError}" TextWrapping="Wrap" />
+            <WrapPanel Margin="0,4">
+                <TextBlock Margin="0,0,10,0"><Run Foreground="#B00020" FontWeight="Bold" Text="{Binding CriticalCount, Mode=OneWay}" /> critical</TextBlock>
+                <TextBlock Margin="0,0,10,0"><Run Foreground="#E04A1F" FontWeight="Bold" Text="{Binding HighCount, Mode=OneWay}" /> high</TextBlock>
+                <TextBlock Margin="0,0,10,0"><Run FontWeight="Bold" Text="{Binding OtherCount, Mode=OneWay}" /> other</TextBlock>
+                <TextBlock Margin="0,0,10,0"><Run Foreground="#1F6FEB" FontWeight="Bold" Text="{Binding NewCount, Mode=OneWay}" /> new</TextBlock>
+                <TextBlock Margin="0,0,10,0"><Run Foreground="#2E7D32" FontWeight="Bold" Text="{Binding ResolvedCount, Mode=OneWay}" /> resolved</TextBlock>
+                <TextBlock><Run FontWeight="Bold" Text="{Binding StaleCount, Mode=OneWay}" /> stale</TextBlock>
+            </WrapPanel>
+        </StackPanel>
+
+        <!-- Controls -->
+        <Grid DockPanel.Dock="Top" Margin="0,2,0,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+            <Button Grid.Row="0" Grid.Column="0" Padding="8,2" Margin="0,0,4,4" Command="{Binding PauseResumeCommand}">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Content" Value="Pause" />
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsPaused}" Value="True">
+                                <Setter Property="Content" Value="Resume" />
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+            <Button Grid.Row="0" Grid.Column="1" Padding="8,2" Margin="0,0,4,4" Content="Full scan" Command="{Binding FullScanCommand}" />
+            <ComboBox Grid.Row="0" Grid.Column="2" Margin="0,0,0,4" ToolTip="Monitoring scope" ItemsSource="{Binding ScopeOptions}" SelectedItem="{Binding ScopeKind}" />
+            <ComboBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Margin="0,0,4,0" ToolTip="Minimum severity shown" ItemsSource="{Binding SeverityOptions}" SelectedItem="{Binding MinimumSeverity}" />
+            <ComboBox Grid.Row="1" Grid.Column="2" ToolTip="Group issues by" ItemsSource="{Binding GroupingOptions}" SelectedItem="{Binding Grouping}" />
+        </Grid>
+
+        <!-- Selected issue details and corrections -->
+        <Border DockPanel.Dock="Bottom" BorderBrush="#DDD" BorderThickness="0,1,0,0" Padding="0,6,0,0" MaxHeight="420"
+                Visibility="{Binding SelectedIssue, Converter={x:Static ui:ClashPaneView.NullToCollapsed}}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel DataContext="{Binding}">
+                    <TextBlock FontWeight="Bold" Text="{Binding SelectedIssue.Title}" />
+                    <TextBlock Foreground="#555" Text="{Binding SelectedIssue.Id}" />
+                    <TextBlock Margin="0,4" TextWrapping="Wrap" Text="{Binding SelectedIssue.Explanation}" />
+                    <TextBlock Foreground="#444" TextWrapping="Wrap" Text="{Binding SelectedIssue.Measurements}" />
+                    <TextBlock Margin="0,4" TextWrapping="Wrap"><Run FontWeight="SemiBold" Text="Recommended: " /><Run Text="{Binding SelectedIssue.RecommendedAction, Mode=OneWay}" /></TextBlock>
+                    <WrapPanel Margin="0,4">
+                        <Button Padding="8,2" Margin="0,0,4,0" Content="Select" Command="{Binding SelectElementsCommand}" />
+                        <Button Padding="8,2" Margin="0,0,4,0" Content="Zoom to" Command="{Binding ZoomToElementsCommand}" />
+                        <Button Padding="8,2" Content="Inspect corrections" Command="{Binding InspectCorrectionsCommand}" />
+                    </WrapPanel>
+                    <TextBlock Margin="0,4" Foreground="#333" TextWrapping="Wrap" Text="{Binding ActionMessage}" />
+                    <ListBox ItemsSource="{Binding Corrections}" SelectedItem="{Binding SelectedCorrection}" MaxHeight="180">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type vm:CorrectionItemViewModel}">
+                                <StackPanel Margin="0,2">
+                                    <TextBlock TextWrapping="Wrap"><Run FontWeight="SemiBold" Text="{Binding Strategy, Mode=OneWay}" /> — <Run Text="{Binding Description, Mode=OneWay}" /></TextBlock>
+                                    <TextBlock Foreground="#666" FontSize="11" TextWrapping="Wrap" Text="{Binding Notes}" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                    <Button Margin="0,4,0,0" Padding="8,2" HorizontalAlignment="Left" Content="Approve and apply selected correction" Command="{Binding ApplyCorrectionCommand}" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- Issue list: flat or grouped -->
+        <Grid>
+            <ListBox ItemsSource="{Binding Issues}" SelectedItem="{Binding SelectedIssue}" ItemTemplate="{StaticResource IssueRow}" HorizontalContentAlignment="Stretch"
+                     Visibility="{Binding Grouping, Converter={StaticResource FlatVisible}}" />
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding Grouping, Converter={StaticResource GroupedVisible}}">
+                <ItemsControl ItemsSource="{Binding Groups}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:IssueGroupViewModel}">
+                            <Expander IsExpanded="True" Margin="0,0,0,4">
+                                <Expander.Header>
+                                    <TextBlock FontWeight="SemiBold"><Run Text="{Binding Key, Mode=OneWay}" /> (<Run Text="{Binding Count, Mode=OneWay}" />)</TextBlock>
+                                </Expander.Header>
+                                <ListBox ItemsSource="{Binding Items}" ItemTemplate="{StaticResource IssueRow}" HorizontalContentAlignment="Stretch" BorderThickness="0"
+                                         SelectedItem="{Binding DataContext.SelectedIssue, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                            </Expander>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+    </DockPanel>
+</UserControl>

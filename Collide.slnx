@@ -1,0 +1,24 @@
+<Solution>
+  <Configurations>
+    <BuildType Name="Debug.R25" />
+    <BuildType Name="Debug.R26" />
+    <BuildType Name="Debug.R27" />
+    <BuildType Name="Release.R25" />
+    <BuildType Name="Release.R26" />
+    <BuildType Name="Release.R27" />
+  </Configurations>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="global.json" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Collide.Core/Collide.Core.csproj" />
+    <Project Path="src/Collide.Presentation/Collide.Presentation.csproj" />
+    <Project Path="src/Collide.Revit/Collide.Revit.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Collide.Core.Tests/Collide.Core.Tests.csproj" />
+    <Project Path="tests/Collide.Presentation.Tests/Collide.Presentation.Tests.csproj" />
+  </Folder>
+</Solution>

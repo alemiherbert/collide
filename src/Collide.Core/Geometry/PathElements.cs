@@ -89,6 +89,23 @@ public sealed class ArcElement : PathElement
 
     public Vec3 Normal => Vec3.Cross(U, V);
 
+    /// <summary>
+    /// Arc from its centre, start and end points, travelling counter-clockwise about <paramref name="normal"/>
+    /// (for a Revit Arc traversed from end point 0 to 1 this is <c>Arc.Normal</c>; when the chain traverses it reversed,
+    /// pass the negated normal). A start equal to the end gives a full circle.
+    /// </summary>
+    public static ArcElement FromCenterStartEnd(Vec3 center, Vec3 start, Vec3 end, Vec3 normal, PathElementKind kind = PathElementKind.Bend)
+    {
+        var radius = Vec3.Distance(center, start);
+        var u = (start - center).Normalized();
+        var n = normal.Normalized();
+        var v = Vec3.Cross(n, u).Normalized();
+        var d = end - center;
+        var sweep = Math.Atan2(Vec3.Dot(d, v), Vec3.Dot(d, u));
+        if (sweep <= 1e-9) sweep += 2 * Math.PI;
+        return new ArcElement(center, radius, u, v, sweep, kind);
+    }
+
     public Vec3 PointAt(double phi) => Center + (U * Math.Cos(phi) + V * Math.Sin(phi)) * Radius;
     public Vec3 TangentAt(double phi) => (V * Math.Cos(phi) - U * Math.Sin(phi)).Normalized();
 

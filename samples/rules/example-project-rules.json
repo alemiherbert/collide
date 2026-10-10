@@ -1,0 +1,151 @@
+// EXAMPLE rule configuration for the Collide rebar clash engine.
+//
+// Every numeric value below is an illustrative PROJECT placeholder. None of them is quoted from a design code.
+// Replace them with the values your governing standard and project specification require, record the clause in
+// each rule's "source", and set "verified": true only after an engineer has checked the rule. Until then, any
+// compliance finding against the rule is reported as "suspected", never "confirmed".
+//
+// Lengths and angles must carry units ("40 mm", "0.04 m", "1.5 in", "135 deg"); bare numbers are rejected.
+{
+  "schemaVersion": "1.0",
+  "name": "Example project rules",
+  "revision": "A (example)",
+  "designStandard": {
+    "name": "<governing design standard>",
+    "version": "<edition>",
+    "notes": "Placeholder: state the standard, edition and national annex applicable to the project."
+  },
+  "tolerances": {
+    "contactTolerance": "0.5 mm",
+    "complianceTolerance": "0.01 mm",
+    "duplicateTolerance": "1 mm",
+    "parallelAngleTolerance": "2 deg",
+    "arcChordTolerance": "0.1 mm",
+    "minimumParallelOverlap": "50 mm",
+    "lapInferenceMaxOffsetFactor": 4,
+    "minorPenetration": "2 mm",
+    "interfaceProbeOffset": "1 mm",
+    "inferAnchorage": true,
+    "inferLaps": true
+  },
+  "project": {
+    "maximumAggregateSize": "20 mm",
+    "concreteGrade": "<grade>"
+  },
+  "requiredChecks": ["Cover", "ClearSpacing", "Lap", "Anchorage", "Bend", "Hook"],
+
+  "cover": [
+    { "id": "COV-SLAB", "description": "Slab top/bottom cover", "source": { "document": "Example project specification", "clause": "4.1", "note": "placeholder value" },
+      "scope": { "hostCategories": ["Slab"], "faceTags": ["Top", "Bottom"] }, "minimumCover": "25 mm", "verified": false },
+    { "id": "COV-SLAB-EDGE", "source": { "document": "Example project specification", "clause": "4.1" },
+      "scope": { "hostCategories": ["Slab"] }, "minimumCover": "30 mm", "verified": false },
+    { "id": "COV-BEAM", "source": { "document": "Example project specification", "clause": "4.2" },
+      "scope": { "hostCategories": ["Beam"] }, "minimumCover": "35 mm", "verified": false },
+    { "id": "COV-COLUMN", "source": { "document": "Example project specification", "clause": "4.2" },
+      "scope": { "hostCategories": ["Column"] }, "minimumCover": "35 mm", "verified": false },
+    { "id": "COV-WALL", "source": { "document": "Example project specification", "clause": "4.3" },
+      "scope": { "hostCategories": ["Wall"] }, "minimumCover": "30 mm", "verified": false },
+    { "id": "COV-FOUNDATION", "source": { "document": "Example project specification", "clause": "4.4", "note": "cast against blinding" },
+      "scope": { "hostCategories": ["Footing", "PileCap"] }, "minimumCover": "50 mm", "verified": false },
+    { "id": "COV-OPENING", "source": { "document": "Example project specification", "clause": "4.5" },
+      "scope": { "faceTags": ["Opening"] }, "minimumCover": "25 mm", "verified": false }
+  ],
+
+  "clearSpacing": [
+    { "id": "SPC-SAME-LAYER", "description": "Clear distance between parallel bars in one layer = max of the terms",
+      "source": { "document": "Example project specification", "clause": "5.1" },
+      "barDiameterFactor": 1.0, "aggregateAllowance": "5 mm", "absoluteMinimum": "20 mm", "relation": "SameLayer", "verified": false },
+    { "id": "SPC-BETWEEN-LAYERS", "source": { "document": "Example project specification", "clause": "5.2" },
+      "barDiameterFactor": 1.0, "absoluteMinimum": "20 mm", "relation": "BetweenLayers", "verified": false }
+  ],
+
+  "maxSpacing": [
+    { "id": "MAX-SLAB", "source": { "document": "Example project specification", "clause": "5.3" },
+      "scope": { "hostCategories": ["Slab"], "barRoles": ["Distribution"] }, "maximumCentreSpacing": "300 mm", "verified": false }
+  ],
+
+  "lapLengths": [
+    { "id": "LAP-GENERAL", "description": "Tension lap length", "source": { "document": "Example project specification", "clause": "6.1" },
+      "diameterFactor": 50, "minimum": "300 mm",
+      "table": [ { "diameter": "12 mm", "length": "600 mm" }, { "diameter": "16 mm", "length": "800 mm" } ],
+      "measurementBasis": "overlap length between the bar ends along the lap axis", "verified": false }
+  ],
+
+  "nonContactLaps": [
+    { "id": "LAP-NONCONTACT", "source": { "document": "Example project specification", "clause": "6.2" },
+      "maximumClearOffset": "50 mm", "verified": false }
+  ],
+
+  "developmentLengths": [
+    { "id": "DEV-STRAIGHT", "source": { "document": "Example project specification", "clause": "6.3" },
+      "anchorageType": "Straight", "diameterFactor": 40, "minimum": "300 mm",
+      "measurementBasis": "centreline length inside the anchoring member, from the bar end", "verified": false },
+    { "id": "DEV-HOOKED", "source": { "document": "Example project specification", "clause": "6.4" },
+      "anchorageType": "Hooked", "diameterFactor": 25, "minimum": "200 mm",
+      "measurementBasis": "centreline length inside the anchoring member, from the bar end (including the hook)", "verified": false }
+  ],
+
+  "bends": [
+    { "id": "BEND-LINKS", "source": { "document": "Example project specification", "clause": "7.1" },
+      "scope": { "barRoles": ["Stirrup", "Tie", "Crosstie"] }, "minimumInnerDiameterFactor": 4, "verified": false },
+    { "id": "BEND-SMALL", "source": { "document": "Example project specification", "clause": "7.1" },
+      "scope": { "maximumDiameter": "16 mm" }, "minimumInnerDiameterFactor": 4, "verified": false },
+    { "id": "BEND-LARGE", "source": { "document": "Example project specification", "clause": "7.1" },
+      "scope": { "minimumDiameter": "20 mm" }, "minimumInnerDiameterFactor": 7, "verified": false }
+  ],
+
+  "hooks": [
+    { "id": "HOOK-90", "source": { "document": "Example project specification", "clause": "7.2" },
+      "hookAngle": "90 deg", "angleTolerance": "5 deg", "extensionDiameterFactor": 12, "verified": false },
+    { "id": "HOOK-135-LINKS", "source": { "document": "Example project specification", "clause": "7.3" },
+      "scope": { "barRoles": ["Stirrup", "Tie", "Crosstie"] }, "hookAngle": "135 deg", "extensionDiameterFactor": 6, "minimumExtension": "75 mm", "verified": false }
+  ],
+
+  "transverseSpacing": [
+    { "id": "TRV-BEAM", "source": { "document": "Example project specification", "clause": "8.1" },
+      "scope": { "hostCategories": ["Beam"] }, "maximumSpacing": "300 mm", "zone": "Entire", "verified": false },
+    { "id": "TRV-COLUMN-ENDS", "description": "Confinement zones at column ends",
+      "source": { "document": "Example project specification", "clause": "8.2" },
+      "scope": { "hostCategories": ["Column"] }, "maximumSpacing": "100 mm", "zone": "EndZones", "endZoneLength": "600 mm", "verified": false }
+  ],
+
+  "restrictions": [
+    { "id": "DIA-RANGE", "source": { "document": "Example project specification", "clause": "3.1", "note": "stocked diameters" },
+      "allowedDiameters": ["8 mm", "10 mm", "12 mm", "16 mm", "20 mm", "25 mm", "32 mm", "40 mm"], "verified": false }
+  ],
+
+  "congestion": [
+    { "id": "CONG-GENERAL", "description": "Local steel-volume ratio limit for concrete placement",
+      "source": { "document": "Example project specification", "clause": "9.1" }, "maximumSteelRatio": 0.06, "cellSize": "200 mm", "verified": false }
+  ],
+
+  "placement": [
+    { "id": "PLC-SLAB-MESH", "description": "Slab/footing mesh bars may be relocated in plan",
+      "source": { "document": "Example placement tolerance specification", "clause": "2" },
+      "scope": { "hostCategories": ["Slab", "Footing", "PileCap"], "barRoles": ["Distribution"] },
+      "maximumDisplacement": "20 mm", "autoApplyMaximumDisplacement": "10 mm", "frame": "Global", "allowedAxes": ["X", "Y"] },
+    { "id": "PLC-WALL", "source": { "document": "Example placement tolerance specification", "clause": "3" },
+      "scope": { "hostCategories": ["Wall"], "barRoles": ["Distribution"] },
+      "maximumDisplacement": "15 mm", "frame": "Host", "allowedAxes": ["X", "Z"] }
+  ],
+
+  "intentionalContacts": [
+    { "id": "IC-MESH-LAYERS", "description": "Orthogonal bars of adjacent layers resting on each other",
+      "source": { "document": "Example project specification", "clause": "5.4" },
+      "rolesA": ["Distribution", "OpeningTrimmer"], "rolesB": ["Distribution", "OpeningTrimmer"],
+      "requireDifferentLayers": true, "minimumAngle": "60 deg", "maximumPenetration": "0.5 mm" },
+    { "id": "IC-LINKS", "description": "Longitudinal bars tied against stirrups/ties",
+      "source": { "document": "Example project specification", "clause": "5.5" },
+      "rolesA": ["Longitudinal", "Starter"], "rolesB": ["Stirrup", "Tie", "Crosstie"], "maximumPenetration": "0.5 mm" }
+  ],
+
+  "exceptions": [],
+  "severityOverrides": [],
+
+  "resolution": {
+    "mode": "ProposeOnly",
+    "ambiguityMargin": 0.05,
+    "displacementIncrement": "1 mm",
+    "maxCandidatesPerIssue": 24
+  }
+}

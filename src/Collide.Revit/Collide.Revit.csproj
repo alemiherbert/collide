@@ -1,0 +1,36 @@
+<Project Sdk="Nice3point.Revit.Sdk/6.2.3">
+  <!--
+    Revit add-in: adapter (Integration/), commands, dockable pane (UI/) and application wiring.
+    Same SDK, configuration names and Toolkit pattern as Tekton: Debug.R25 / .R26 (net8.0-windows) and .R27 (net10.0-windows).
+    Compiles on Linux/macOS against Revit reference assemblies (EnableWindowsTargeting); runs only inside Revit on Windows.
+  -->
+  <PropertyGroup>
+    <UseWPF>true</UseWPF>
+    <Configurations>Debug.R25;Debug.R26;Debug.R27;Release.R25;Release.R26;Release.R27</Configurations>
+    <DeployAddin Condition="'$(OS)' == 'Windows_NT'">true</DeployAddin>
+    <DeployAddin Condition="'$(OS)' != 'Windows_NT'">false</DeployAddin>
+    <LaunchRevit>false</LaunchRevit>
+    <IsRepackable>false</IsRepackable>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <EnableWindowsTargeting Condition="'$(OS)' != 'Windows_NT'">true</EnableWindowsTargeting>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Nice3point.Revit.Toolkit" Version="$(RevitVersion).*" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPI" Version="$(RevitVersion).*" />
+    <PackageReference Include="Nice3point.Revit.Api.RevitAPIUI" Version="$(RevitVersion).*" />
+    <PackageReference Include="Serilog" Version="4.4.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Collide.Core\Collide.Core.csproj" />
+    <ProjectReference Include="..\Collide.Presentation\Collide.Presentation.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Collide.addin" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Example rules only: copy and adapt to the project; they are not design-code values. -->
+    <None Include="..\..\samples\rules\example-project-rules.json" Link="collide.rules.example.json" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
