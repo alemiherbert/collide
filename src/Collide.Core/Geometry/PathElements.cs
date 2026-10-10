@@ -119,6 +119,45 @@ public sealed class ArcElement : PathElement
 
     public override PathElement Translate(Vec3 offset) => new ArcElement(Center + offset, Radius, U, V, Sweep, Kind);
 
+    /// <summary>Arc parameter φ ∈ [0, 2π) of a point on (or near) the arc.</summary>
+    public double ParameterOf(Vec3 p)
+    {
+        var d = p - Center;
+        var phi = Math.Atan2(Vec3.Dot(d, V), Vec3.Dot(d, U));
+        return phi < -1e-12 ? phi + 2 * Math.PI : Math.Max(0, phi);
+    }
+
+    /// <summary>
+    /// Exact maximum of the plane's signed distance over the sub-arc φ ∈ [phi0, phi1]:
+    /// sd(φ) = sd(centre) + A·cos φ + B·sin φ with A = R·(n·U), B = R·(n·V).
+    /// </summary>
+    public double MaxSignedDistance(Plane plane, double phi0, double phi1, out double atPhi)
+    {
+        var a = Radius * Vec3.Dot(plane.Normal, U);
+        var b = Radius * Vec3.Dot(plane.Normal, V);
+        var c = plane.SignedDistance(Center);
+        double Sd(double phi) => c + a * Math.Cos(phi) + b * Math.Sin(phi);
+        atPhi = phi0;
+        var best = Sd(phi0);
+        if (Sd(phi1) > best)
+        {
+            best = Sd(phi1);
+            atPhi = phi1;
+        }
+
+        var peak = Math.Atan2(b, a);
+        foreach (var candidate in new[] { peak, peak + 2 * Math.PI, peak - 2 * Math.PI })
+        {
+            if (candidate > phi0 && candidate < phi1 && Sd(candidate) > best)
+            {
+                best = Sd(candidate);
+                atPhi = candidate;
+            }
+        }
+
+        return best;
+    }
+
     /// <summary>Number of equal chords needed so the sagitta does not exceed <paramref name="chordTolerance"/>.</summary>
     public int ChordCount(double chordTolerance)
     {

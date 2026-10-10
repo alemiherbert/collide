@@ -9,7 +9,9 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
+    <!-- Same structured logger and version as Tekton (merge target). No Microsoft.Extensions packages here:
+         Revit 2025 shares one load context across add-ins, so their generation must match the host runtime. -->
+    <PackageReference Include="Serilog" Version="4.4.0" />
   </ItemGroup>
   <ItemGroup>
     <InternalsVisibleTo Include="Collide.Core.Tests" />

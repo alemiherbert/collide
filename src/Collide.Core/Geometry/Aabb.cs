@@ -39,6 +39,8 @@ public readonly struct Aabb
         return new Aabb(Vec3.Min(Min, other.Min), Vec3.Max(Max, other.Max));
     }
 
+    public Aabb Intersection(Aabb other) => new(Vec3.Max(Min, other.Min), Vec3.Min(Max, other.Max));
+
     public Aabb Inflate(double amount)
     {
         if (IsEmpty) return this;

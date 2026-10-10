@@ -63,6 +63,15 @@ public sealed class OrientedBox
         return Math.Sqrt(dx * dx + dy * dy + dz * dz);
     }
 
+    public Vec3 ClosestPoint(Vec3 p)
+    {
+        var l = ToLocal(p);
+        return ToWorld(new Vec3(
+            Math.Clamp(l.X, -HalfExtents.X, HalfExtents.X),
+            Math.Clamp(l.Y, -HalfExtents.Y, HalfExtents.Y),
+            Math.Clamp(l.Z, -HalfExtents.Z, HalfExtents.Z)));
+    }
+
     public IEnumerable<Vec3> Corners()
     {
         for (var i = -1; i <= 1; i += 2)
