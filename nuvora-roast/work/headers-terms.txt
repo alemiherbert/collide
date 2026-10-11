@@ -1,0 +1,14 @@
+HTTP/1.1 200 Connection Established
+
+HTTP/2 200 
+access-control-allow-origin: https://nuvora-ug.netlify.app
+content-type: application/json
+date: Sun, 11 Oct 2026 13:19:46 GMT
+server: railway-hikari
+vary: Origin
+vary: accept-encoding
+x-railway-request-id: sFXPvMqrSoSMdUrOljLL4A
+content-length: 8764
+x-hikari-trace: iad1.trg5
+x-railway-edge: iad1
+

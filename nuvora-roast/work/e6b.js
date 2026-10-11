@@ -1,0 +1,13 @@
+const L=require('./lib'); const fs=require('fs');
+(async()=>{ const {browser,page,log}=await L.launch(); const S='../screenshots/';
+await L.clickText(page,'Create an account'); await page.mouse.click(50,680); await page.waitForTimeout(2500);
+const net=()=>log.filter(l=>/railway/.test(l.u)&&l.m!=='GET').map(l=>l.m+' '+l.u+' '+l.s+' '+l.pd).join(' | ')||'(none)';
+const btnClick=async()=>{const p=await page.evaluate(()=>{const e=[...document.querySelectorAll('flt-semantics[role=button]')].find(x=>x.textContent.trim()==='Create Account');const r=e.getBoundingClientRect();return [r.x+30,r.y+r.height/2]});await page.mouse.click(p[0],p[1]);await page.waitForTimeout(1800);};
+const text=async()=>(await L.sem(page)).split('\n')[0].replace(/^group ; /,'').slice(0,300);
+await page.mouse.click(180,274); await page.keyboard.type('Roast Tester');
+await page.mouse.click(180,376); await page.keyboard.type('12345');
+await page.mouse.click(70,478); await page.keyboard.type(process.env.NUVORA_TEST_PIN);
+await page.mouse.click(70,582); await page.keyboard.type(process.env.NUVORA_TEST_PIN);
+page.on('response',async r=>{ if(/railway/.test(r.url())&&r.request().method()!=='GET'){ console.log('RESP',r.status(),r.url(),JSON.stringify(r.headers()).slice(0,600),'\nBODY',(await r.text().catch(()=>'')).slice(0,800)); }});
+await btnClick(); for (const w of [1000,4000,8000]) { await page.waitForTimeout(w); console.log('t+',w,'buttons:',(await L.sem(page)).split('\n').slice(1).map(x=>x.split(' ; ')[1]).join(' | ')); } console.log('B short phone, matching pins:',await text(),'\nNET',net()); await page.screenshot({path:S+'11-mobile-signup-invalid-phone.png'});
+await browser.close(); })();
